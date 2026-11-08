@@ -1,0 +1,602 @@
+{
+  "scenarios": {
+    "lunar_ice_lander": {
+      "name": "Operation Shackleton: Lunar South Pole Ice Lander",
+      "difficulty": "Beginner",
+      "difficulty_color": "#10b981",
+      "description": "Deploy a neutron spectrometer lander to Shackleton Crater at the lunar south pole. Confirm and map subsurface water-ice deposits critical for future Artemis base camp ISRU fuel production. This is humanity's first step toward permanent lunar habitation.",
+      "target_body": "Moon",
+      "regime": "Lunar Surface",
+      "solar_distance_au": 1.0,
+      "budget_cap_m": 220,
+      "min_science_points": 250,
+      "required_instruments": ["neutron_spec"],
+      "required_dv_ms": 15320,
+      "view_mode": "earth_moon",
+      "burn_budget": {
+        "dv_leo_ms": 9400,
+        "dv_injection_ms": 3150,
+        "dv_capture_ms": 920,
+        "dv_descent_ms": 1850,
+        "injection_label": "TLI — Trans-Lunar Injection",
+        "capture_label": "LOI — Lunar Orbit Insertion",
+        "descent_label": "PDI — Powered Descent & Landing"
+      },
+      "transfer_time_days": 3.5,
+      "semi_major_axis_au": 0.00257,
+      "eccentricity": 0.967,
+      "target_orbit_km": 100
+    },
+    "mars_climate_orbiter": {
+      "name": "Ares Recon: Mars Climate & Subsurface Orbiter",
+      "difficulty": "Intermediate",
+      "difficulty_color": "#f59e0b",
+      "description": "Insert a high-resolution climate and atmospheric science platform into Low Mars Orbit. HiRISE-class imaging combined with an infrared atmospheric sounder will map global dust storms, methane plumes, and subsurface ice. Solar power is marginal at 1.52 AU — budget carefully.",
+      "target_body": "Mars",
+      "regime": "Low Mars Orbit",
+      "solar_distance_au": 1.52,
+      "budget_cap_m": 320,
+      "min_science_points": 450,
+      "required_instruments": ["hirise_cam", "atmo_sounder"],
+      "required_dv_ms": 14850,
+      "view_mode": "solar_system",
+      "burn_budget": {
+        "dv_leo_ms": 9400,
+        "dv_injection_ms": 3600,
+        "dv_capture_ms": 1850,
+        "dv_descent_ms": 0,
+        "injection_label": "TMI — Trans-Mars Injection",
+        "capture_label": "MOI — Mars Orbit Insertion",
+        "descent_label": null
+      },
+      "transfer_time_days": 259,
+      "semi_major_axis_au": 1.26,
+      "eccentricity": 0.207,
+      "target_orbit_km": 400
+    },
+    "venus_aerobot": {
+      "name": "Aphrodite: Venus High-Atmosphere Aerobot & Radar Mapper",
+      "difficulty": "Intermediate",
+      "difficulty_color": "#f59e0b",
+      "description": "Deploy a solar-powered aerobot balloon probe into the temperate 50 km cloud deck of Venus while a radar mapper characterizes surface geology and volcanic activity from orbit. At 0.72 AU, solar arrays produce nearly double the Earth-baseline power — but entry heat is extreme. Budget includes ESA partnership contribution.",
+      "target_body": "Venus",
+      "regime": "Venus Orbit / Atmospheric Probe",
+      "solar_distance_au": 0.72,
+      "budget_cap_m": 290,
+      "min_science_points": 400,
+      "required_instruments": ["atmo_sounder", "lidar"],
+      "required_dv_ms": 15200,
+      "view_mode": "solar_system",
+      "burn_budget": {
+        "dv_leo_ms": 9400,
+        "dv_injection_ms": 3490,
+        "dv_capture_ms": 2100,
+        "dv_descent_ms": 210,
+        "injection_label": "TVI — Trans-Venus Injection",
+        "capture_label": "VOI — Venus Orbit Insertion + Aerocapture",
+        "descent_label": "Probe Entry & Aerobot Deploy"
+      },
+      "transfer_time_days": 146,
+      "semi_major_axis_au": 0.86,
+      "eccentricity": 0.163,
+      "target_orbit_km": 300
+    },
+    "europa_flyby": {
+      "name": "Oceanus: Europa Ice-Penetrating Jovian Flyby",
+      "difficulty": "Advanced",
+      "difficulty_color": "#ef4444",
+      "description": "Send a radiation-hardened spacecraft to the Jovian system to execute 44 close Europa flybys. VHF ice-penetrating radar will probe the 10–30 km ice shell for a subsurface liquid water ocean. At 5.2 AU, solar irradiance is 27× weaker than at Earth — only an RTG guarantees continuous operation through Jupiter's deadly Van Allen-equivalent radiation belts.",
+      "target_body": "Jupiter (Europa)",
+      "regime": "Jovian Capture & Europa Flyby",
+      "solar_distance_au": 5.2,
+      "budget_cap_m": 650,
+      "min_science_points": 700,
+      "required_instruments": ["ice_radar", "mag_plasma"],
+      "required_dv_ms": 18900,
+      "view_mode": "solar_system",
+      "burn_budget": {
+        "dv_leo_ms": 9400,
+        "dv_injection_ms": 6100,
+        "dv_capture_ms": 870,
+        "dv_descent_ms": 2530,
+        "injection_label": "TJI — Trans-Jovian Injection (direct)",
+        "capture_label": "JOI — Jupiter Orbit Insertion",
+        "descent_label": "Europa Tour ΔV (44 flybys)"
+      },
+      "transfer_time_days": 997,
+      "semi_major_axis_au": 3.1,
+      "eccentricity": 0.677,
+      "target_orbit_km": 200
+    },
+    "titan_lander": {
+      "name": "Kronos: Titan Methane Sea Lander",
+      "difficulty": "Expert",
+      "difficulty_color": "#8b5cf6",
+      "description": "Land a buoyant probe on Ligeia Mare, Titan's northern methane sea, to characterize organic chemistry and search for signs of prebiotic complexity. At 9.5 AU, solar arrays are useless — only nuclear RTG power survives. The 6-year cruise through deep space demands uncompromising reliability. This is the most complex planetary mission ever attempted.",
+      "target_body": "Saturn (Titan)",
+      "regime": "Titan Surface / Sea Landing",
+      "solar_distance_au": 9.5,
+      "budget_cap_m": 950,
+      "min_science_points": 850,
+      "required_instruments": ["mass_spec", "micro_rover"],
+      "required_dv_ms": 21500,
+      "view_mode": "solar_system",
+      "burn_budget": {
+        "dv_leo_ms": 9400,
+        "dv_injection_ms": 7900,
+        "dv_capture_ms": 850,
+        "dv_descent_ms": 3350,
+        "injection_label": "TSI — Trans-Saturn Injection (direct)",
+        "capture_label": "SOI — Saturn Orbit Insertion",
+        "descent_label": "Titan Aerocapture + Sea Splashdown"
+      },
+      "transfer_time_days": 2211,
+      "semi_major_axis_au": 5.275,
+      "eccentricity": 0.810,
+      "target_orbit_km": 1500
+    }
+  },
+
+  "rockets": {
+    "pslv_xl": {
+      "name": "ISRO PSLV-C40 / PSLV-XL",
+      "agency": "ISRO",
+      "country": "India",
+      "cost_m": 28,
+      "max_leo_payload_kg": 1750,
+      "model_glb": "pslv_c40.glb",
+      "description": "India's workhorse 4-stage polar launch vehicle. Proven record of 50+ missions. Ideal for small science payloads to GTO or escape trajectories using its upper kick stage.",
+      "stages": [
+        {
+          "name": "PS1 Core + 6× PSOM-XL Strap-ons",
+          "dry_mass_kg": 28000,
+          "prop_mass_kg": 180200,
+          "isp_s": 269,
+          "thrust_kn": 7636,
+          "propellant": "HTPB Solid"
+        },
+        {
+          "name": "PS2 — Vikas Liquid Engine",
+          "dry_mass_kg": 4500,
+          "prop_mass_kg": 37500,
+          "isp_s": 293,
+          "thrust_kn": 799,
+          "propellant": "UDMH / N₂O₄"
+        },
+        {
+          "name": "PS3 Solid Motor",
+          "dry_mass_kg": 2000,
+          "prop_mass_kg": 7600,
+          "isp_s": 294,
+          "thrust_kn": 328,
+          "propellant": "HTPB Solid"
+        },
+        {
+          "name": "PS4 — Twin L-2-5 Engines",
+          "dry_mass_kg": 1100,
+          "prop_mass_kg": 2500,
+          "isp_s": 308,
+          "thrust_kn": 14.6,
+          "propellant": "MMH / MON-3"
+        }
+      ]
+    },
+
+    "lvm3": {
+      "name": "ISRO LVM3 (Bahubali / GSLV Mk III)",
+      "agency": "ISRO",
+      "country": "India",
+      "cost_m": 65,
+      "max_leo_payload_kg": 8000,
+      "model_glb": "gslv_mk_iii.glb",
+      "description": "India's most powerful operational launch vehicle. Cryogenic C25 upper stage enables GTO and interplanetary missions. The LVM3-M2 OneWeb mission demonstrated commercial viability.",
+      "stages": [
+        {
+          "name": "2× S200 Solid Strap-on Boosters",
+          "dry_mass_kg": 30000,
+          "prop_mass_kg": 400000,
+          "isp_s": 274,
+          "thrust_kn": 10185,
+          "propellant": "HTPB Solid"
+        },
+        {
+          "name": "L110 Core — 2× Vikas-2 Engines",
+          "dry_mass_kg": 10000,
+          "prop_mass_kg": 110000,
+          "isp_s": 293,
+          "thrust_kn": 1598,
+          "propellant": "UDMH / N₂O₄"
+        },
+        {
+          "name": "C25 Cryogenic Upper Stage — CE-20",
+          "dry_mass_kg": 4000,
+          "prop_mass_kg": 28000,
+          "isp_s": 443,
+          "thrust_kn": 200,
+          "propellant": "LH₂ / LOX"
+        }
+      ]
+    },
+
+    "falcon_9": {
+      "name": "SpaceX Falcon 9 Block 5 (Expendable)",
+      "agency": "SpaceX",
+      "country": "USA",
+      "cost_m": 67,
+      "max_leo_payload_kg": 22800,
+      "model_glb": "spacex_falcon_9_block_5.glb",
+      "description": "The world's most frequently launched orbital rocket. When flown expendable (no booster recovery), Falcon 9 delivers the maximum LEO payload of 22,800 kg. The Merlin Vacuum engine provides exceptional deep-space performance for interplanetary kick stages.",
+      "stages": [
+        {
+          "name": "Booster B5 — 9× Merlin 1D SL",
+          "dry_mass_kg": 22200,
+          "prop_mass_kg": 411000,
+          "isp_s": 282,
+          "thrust_kn": 7607,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Upper Stage — Merlin 1D Vacuum",
+          "dry_mass_kg": 4000,
+          "prop_mass_kg": 107500,
+          "isp_s": 348,
+          "thrust_kn": 934,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Deep-Space Kick Stage (Star-48BV)",
+          "dry_mass_kg": 120,
+          "prop_mass_kg": 2010,
+          "isp_s": 292,
+          "thrust_kn": 68.6,
+          "propellant": "HTPB Solid"
+        }
+      ]
+    },
+
+    "falcon_heavy": {
+      "name": "SpaceX Falcon Heavy (Expendable)",
+      "agency": "SpaceX",
+      "country": "USA",
+      "cost_m": 97,
+      "max_leo_payload_kg": 63800,
+      "model_glb": "falcon heavy.glb",
+      "description": "Currently the world's most powerful operational rocket. Three Falcon 9 cores generating 22.8 MN of liftoff thrust. In expendable configuration it can deliver 63,800 kg to LEO or 16,800 kg to Mars. Used to launch NASA's Psyche and Europa Clipper missions.",
+      "stages": [
+        {
+          "name": "3× Falcon 9 Cores — 27× Merlin 1D",
+          "dry_mass_kg": 66600,
+          "prop_mass_kg": 1233000,
+          "isp_s": 282,
+          "thrust_kn": 22820,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Upper Stage — Merlin 1D Vacuum",
+          "dry_mass_kg": 4000,
+          "prop_mass_kg": 107500,
+          "isp_s": 348,
+          "thrust_kn": 934,
+          "propellant": "RP-1 / LOX"
+        }
+      ]
+    },
+
+    "sls_block1b": {
+      "name": "NASA SLS Block 1B (Exploration Upper Stage)",
+      "agency": "NASA / Boeing",
+      "country": "USA",
+      "cost_m": 2000,
+      "max_leo_payload_kg": 95000,
+      "model_glb": "low_poly_-_nasa_artemis_ii_sls_rocket.glb",
+      "description": "The Space Launch System Block 1B with Exploration Upper Stage is the most powerful rocket ever flown, surpassing Saturn V in payload to deep space. At $2B per launch it is reserved for the heaviest flagship science missions and crewed Artemis deep-space exploration.",
+      "stages": [
+        {
+          "name": "Core Stage — 4× RS-25E + 2× SRBs",
+          "dry_mass_kg": 90000,
+          "prop_mass_kg": 1340000,
+          "isp_s": 361,
+          "thrust_kn": 39144,
+          "propellant": "LH₂ / LOX + HTPB SRBs"
+        },
+        {
+          "name": "Exploration Upper Stage — 4× RL10C-3",
+          "dry_mass_kg": 13000,
+          "prop_mass_kg": 129000,
+          "isp_s": 466,
+          "thrust_kn": 445,
+          "propellant": "LH₂ / LOX"
+        }
+      ]
+    },
+
+    "new_glenn": {
+      "name": "Blue Origin New Glenn (Expendable)",
+      "agency": "Blue Origin",
+      "country": "USA",
+      "cost_m": 67,
+      "max_leo_payload_kg": 45000,
+      "model_glb": "new_glenn.glb",
+      "description": "Blue Origin's heavy-lift rocket powered by 7 BE-4 methalox engines on the first stage and two BE-3U LH₂ engines on the second stage. Its 7-meter fairing is the largest commercial fairing diameter, accommodating oversized payloads and large solar arrays without folding.",
+      "stages": [
+        {
+          "name": "Stage 1 — 7× BE-4 Methalox",
+          "dry_mass_kg": 52000,
+          "prop_mass_kg": 630000,
+          "isp_s": 316,
+          "thrust_kn": 17150,
+          "propellant": "CH₄ / LOX"
+        },
+        {
+          "name": "Stage 2 — 2× BE-3U Cryo",
+          "dry_mass_kg": 13000,
+          "prop_mass_kg": 197000,
+          "isp_s": 440,
+          "thrust_kn": 710,
+          "propellant": "LH₂ / LOX"
+        }
+      ]
+    },
+
+    "electron": {
+      "name": "Rocket Lab Electron",
+      "agency": "Rocket Lab",
+      "country": "USA / New Zealand",
+      "cost_m": 7.5,
+      "max_leo_payload_kg": 300,
+      "model_glb": "electron_-_rocket_lab.glb",
+      "description": "The premier small satellite launch vehicle. Electron's 9 electric-pump-fed Rutherford engines and 3D-printed components make it the most capable small launcher. Its Kick Stage (Curie engine) can target precise orbital inclinations and deliver payloads to MEO, GTO, or beyond.",
+      "stages": [
+        {
+          "name": "Stage 1 — 9× Rutherford (Vac avg)",
+          "dry_mass_kg": 950,
+          "prop_mass_kg": 9250,
+          "isp_s": 311,
+          "thrust_kn": 192,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Stage 2 — 1× Rutherford Vacuum",
+          "dry_mass_kg": 250,
+          "prop_mass_kg": 2150,
+          "isp_s": 343,
+          "thrust_kn": 25.8,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Curie Kick Stage",
+          "dry_mass_kg": 15,
+          "prop_mass_kg": 50,
+          "isp_s": 320,
+          "thrust_kn": 0.12,
+          "propellant": "Bipropellant (Green)"
+        }
+      ]
+    },
+
+    "long_march_5": {
+      "name": "CNSA Long March 5 (CZ-5)",
+      "agency": "CASC / CALT",
+      "country": "China",
+      "cost_m": 55,
+      "max_leo_payload_kg": 25000,
+      "model_glb": "long_march_5_rocket.glb",
+      "description": "China's most powerful operational rocket, powered by twin cryogenic YF-77 engines on the 5m-diameter core and four kerosene-fueled YF-100 strap-on boosters. Launched Tianwen-1 to Mars, Chang'e-5 lunar sample return, and Wentian / Mengtian space station modules.",
+      "stages": [
+        {
+          "name": "4× Strap-on YF-100 + Core 1st burn",
+          "dry_mass_kg": 49000,
+          "prop_mass_kg": 310000,
+          "isp_s": 320,
+          "thrust_kn": 10560,
+          "propellant": "RP-1 / LOX (strap-ons); LH₂/LOX (core)"
+        },
+        {
+          "name": "Core YF-77 2nd burn + YF-75D Upper",
+          "dry_mass_kg": 18500,
+          "prop_mass_kg": 172000,
+          "isp_s": 435,
+          "thrust_kn": 1050,
+          "propellant": "LH₂ / LOX"
+        }
+      ]
+    },
+
+    "saturn_v": {
+      "name": "Saturn V (Historic / Museum Grade)",
+      "agency": "NASA / Boeing",
+      "country": "USA",
+      "cost_m": 1500,
+      "max_leo_payload_kg": 140000,
+      "model_glb": "Saturn V.glb",
+      "description": "The mightiest rocket in history. 13 flights, 13 successes. Five F-1 engines generating 34.5 MN of thrust thunder 140 tonnes to LEO. Its S-IVB third stage sent 48,500 kg toward the Moon. Use it when only the absolute maximum ΔV reserve is acceptable — if budget is no object.",
+      "stages": [
+        {
+          "name": "S-IC — 5× Rocketdyne F-1",
+          "dry_mass_kg": 130000,
+          "prop_mass_kg": 2077000,
+          "isp_s": 304,
+          "thrust_kn": 34020,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "S-II — 5× Rocketdyne J-2",
+          "dry_mass_kg": 36000,
+          "prop_mass_kg": 444000,
+          "isp_s": 421,
+          "thrust_kn": 4448,
+          "propellant": "LH₂ / LOX"
+        },
+        {
+          "name": "S-IVB — 1× Rocketdyne J-2",
+          "dry_mass_kg": 10000,
+          "prop_mass_kg": 106000,
+          "isp_s": 421,
+          "thrust_kn": 1000,
+          "propellant": "LH₂ / LOX"
+        }
+      ]
+    }
+  },
+
+  "power_systems": {
+    "basic_solar": {
+      "name": "Standard Triple-Junction GaAs Solar Arrays",
+      "type": "solar",
+      "mass_kg": 85,
+      "cost_m": 12,
+      "base_power_w_1au": 600,
+      "efficiency_pct": 29,
+      "description": "Heritage rigid solar panels with proven radiation tolerance. Adequate for inner solar system missions (≤2 AU). Power output degrades severely beyond Mars orbit per inverse-square law."
+    },
+    "rosa_solar": {
+      "name": "ROSA Roll-Out Solar Array",
+      "type": "solar",
+      "mass_kg": 120,
+      "cost_m": 25,
+      "base_power_w_1au": 2800,
+      "efficiency_pct": 33,
+      "description": "NASA's Roll-Out Solar Array, as used on the ISS IROSA upgrade. Lightweight, high-power flexible blankets that stow into compact cylinders. Excellent for Mars-class missions requiring >1 kW but still solar-distance-limited."
+    },
+    "ultraflex_solar": {
+      "name": "Ultraflex Deep-Space Solar Array (MegaFlex)",
+      "type": "solar",
+      "mass_kg": 95,
+      "cost_m": 35,
+      "base_power_w_1au": 1200,
+      "efficiency_pct": 31,
+      "description": "Circular Ultraflex panels (as used on Phoenix, InSight). Highest specific power (W/kg) of any solar technology. Still subject to 1/r² inverse-square law — marginally functional at Jupiter but completely inadequate at Saturn."
+    },
+    "mmrtg": {
+      "name": "Multi-Mission RTG (Pu-238 Nuclear)",
+      "type": "nuclear",
+      "mass_kg": 145,
+      "cost_m": 85,
+      "base_power_w_1au": 450,
+      "efficiency_pct": 6,
+      "description": "Multi-Mission Radioisotope Thermoelectric Generator using 4.8 kg of Pu-238 dioxide. Constant 450 W output at any solar distance — from Venus to Pluto. As used on Cassini, Curiosity, Perseverance, New Horizons, and Voyager. The only viable power source beyond ~3 AU. Output degrades ~0.8% per year."
+    }
+  },
+
+  "comms_systems": {
+    "s_band_omni": {
+      "name": "S-Band Omnidirectional Patch Antenna",
+      "mass_kg": 15,
+      "cost_m": 8,
+      "power_draw_w": 35,
+      "max_data_gb_day": 15,
+      "frequency_ghz": 2.3,
+      "description": "Low-gain omnidirectional antenna requiring no pointing. Used for initial acquisition, emergency uplink, and low-rate telemetry. Severely bandwidth-limited: adequate only for housekeeping data. High-resolution instrument data will be heavily compressed or lost."
+    },
+    "x_band_hga": {
+      "name": "X-Band 2m High-Gain Parabolic Dish",
+      "mass_kg": 55,
+      "cost_m": 22,
+      "power_draw_w": 100,
+      "max_data_gb_day": 120,
+      "frequency_ghz": 8.5,
+      "description": "Standard NASA/ESA deep-space HGA. Requires accurate Earth-pointing gimbal. As used on MRO, Cassini, and Juno. Provides adequate downlink for most science instruments at Mars or Venus distances. Performance degrades at Jupiter and beyond."
+    },
+    "ka_band_array": {
+      "name": "Ka-Band Deep Space High-Gain Array",
+      "mass_kg": 95,
+      "cost_m": 48,
+      "power_draw_w": 200,
+      "max_data_gb_day": 400,
+      "frequency_ghz": 32.0,
+      "description": "Ka-band provides 10× higher throughput than X-band at the same aperture. Sensitive to atmospheric absorption (requires DSN Ka-band ground stations). Used on MRO's science downlink phase. Essential for high-resolution imaging missions."
+    },
+    "dsoc_laser": {
+      "name": "DSOC — Deep Space Optical Communications Laser",
+      "mass_kg": 130,
+      "cost_m": 120,
+      "power_draw_w": 240,
+      "max_data_gb_day": 1200,
+      "frequency_ghz": 282000,
+      "description": "NASA's Deep Space Optical Communications terminal (as demonstrated on Psyche, 2024). Laser photon-based link achieves 100× the downlink rate of Ka-band RF. The photon-counting detector tolerates planetary distances. Required for Jovian-class missions with multi-gigabyte daily science volumes. Very high cost and strict pointing requirements."
+    }
+  },
+
+  "instruments": {
+    "neutron_spec": {
+      "name": "Neutron & Gamma-Ray Spectrometer",
+      "abbreviation": "NGS",
+      "mass_kg": 45,
+      "power_w": 55,
+      "cost_m": 22,
+      "data_gb_day": 10,
+      "science_pts": 180,
+      "description": "Detects hydrogen-bearing molecules (water ice) beneath the surface via moderated neutron flux. Heritage from MESSENGER, Mars Odyssey THEMIS, and LRO LEND. Mandatory for ice-prospecting missions."
+    },
+    "hirise_cam": {
+      "name": "HiRISE-Class Sub-Meter Telephoto Imager",
+      "abbreviation": "HiCAM",
+      "mass_kg": 65,
+      "power_w": 70,
+      "cost_m": 55,
+      "data_gb_day": 95,
+      "science_pts": 260,
+      "description": "Focal plane assembly capable of 25 cm/pixel surface imaging. Generates massive data volumes — requires high-bandwidth antenna or aggressive onboard compression. The highest-resolution planetary imager ever operated."
+    },
+    "atmo_sounder": {
+      "name": "Infrared Atmospheric & Dust Sounder (IRADS)",
+      "abbreviation": "IRADS",
+      "mass_kg": 60,
+      "power_w": 70,
+      "cost_m": 30,
+      "data_gb_day": 25,
+      "science_pts": 190,
+      "description": "Multi-channel thermal infrared spectrometer measuring vertical temperature profiles, water vapor, CO₂, aerosols, and dust optical depth. As used on Mars Climate Sounder (MRO). Essential for atmospheric missions at Mars or Venus."
+    },
+    "ice_radar": {
+      "name": "VHF Ice-Penetrating Subsurface Radar (SHARAD-class)",
+      "abbreviation": "ISAR",
+      "mass_kg": 90,
+      "power_w": 180,
+      "cost_m": 65,
+      "data_gb_day": 120,
+      "science_pts": 320,
+      "description": "Very High Frequency (3–50 MHz) radar that penetrates kilometers of ice or regolith to map subsurface structures, buried lakes, and ocean interfaces. Based on SHARAD (MRO) and RIME (JUICE). The only instrument capable of detecting subsurface oceans beneath Europa's ice shell."
+    },
+    "mag_plasma": {
+      "name": "Boom Magnetometer & Plasma Wave Analyzer",
+      "abbreviation": "BMPA",
+      "mass_kg": 25,
+      "power_w": 35,
+      "cost_m": 18,
+      "data_gb_day": 15,
+      "science_pts": 175,
+      "description": "5-meter deployable boom magnetometer with fluxgate and search-coil sensors, plus a plasma wave analyzer. Measures magnetic field signatures that indicate induced magnetic fields from subsurface oceans (Europa induction signal). Low power, high value."
+    },
+    "lidar": {
+      "name": "Laser Altimeter (LOLA-class LIDAR)",
+      "abbreviation": "LIDAR",
+      "mass_kg": 40,
+      "power_w": 80,
+      "cost_m": 35,
+      "data_gb_day": 20,
+      "science_pts": 200,
+      "description": "Pulsed 1064 nm laser ranging system measuring topography to centimeter vertical precision at multi-kilometer horizontal spacing. Generates precise digital elevation models. Used on MESSENGER, MLA, and LRO LOLA. Essential for terrain characterization prior to landing."
+    },
+    "mass_spec": {
+      "name": "Mass Spectrometer & Gas Chromatograph (GCMS)",
+      "abbreviation": "GCMS",
+      "mass_kg": 75,
+      "power_w": 90,
+      "cost_m": 45,
+      "data_gb_day": 30,
+      "science_pts": 290,
+      "description": "Combined gas chromatograph and quadrupole mass spectrometer capable of identifying complex organic molecules to m/z 1000. Direct heritage from Cassini INMS, Huygens GCMS, and Curiosity SAM. Required for detecting amino acids, lipids, and other biosignature molecules in Titan's methane environment."
+    },
+    "micro_rover": {
+      "name": "Autonomous Surface Micro-Rover (MELA-class)",
+      "abbreviation": "ROVER",
+      "mass_kg": 110,
+      "power_w": 65,
+      "cost_m": 48,
+      "data_gb_day": 20,
+      "science_pts": 220,
+      "description": "30 kg rover with autonomous hazard avoidance, arm-mounted APXS + Raman spectrometer, and micro-camera mast. Traverse capability up to 150 m/sol. Provides ground-truth measurements impossible from orbit. Can survive in Titan's -179°C methane rain environment with MMRTG thermal management."
+    }
+  }
+}
