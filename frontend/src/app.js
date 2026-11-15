@@ -18,7 +18,11 @@
 // ============================================================================
 const Audio = (() => {
     let ctx = null;
-    let enabled = false;
+    let enabled = true;
+
+    function isEnabled() {
+        return typeof audioEnabled !== 'undefined' ? audioEnabled : enabled;
+    }
 
     function _getCtx() {
         if (!ctx) {
@@ -29,7 +33,7 @@ const Audio = (() => {
     }
 
     function playClick() {
-        if (!enabled) return;
+        if (!isEnabled()) return;
         try {
             const ac = _getCtx();
             const osc = ac.createOscillator();
@@ -44,7 +48,7 @@ const Audio = (() => {
     }
 
     function playLaunch() {
-        if (!enabled) return;
+        if (!isEnabled()) return;
         try {
             const ac = _getCtx();
             // Rumble: low noise burst
@@ -77,7 +81,7 @@ const Audio = (() => {
     }
 
     function playAlarm() {
-        if (!enabled) return;
+        if (!isEnabled()) return;
         try {
             const ac = _getCtx();
             [0, 0.25, 0.5].forEach(delay => {
@@ -96,7 +100,7 @@ const Audio = (() => {
     }
 
     function playSuccess() {
-        if (!enabled) return;
+        if (!isEnabled()) return;
         try {
             const ac = _getCtx();
             const freqs = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
@@ -135,6 +139,8 @@ const Audio = (() => {
 // ============================================================================
 // App State & Controller
 // ============================================================================
+let audioEnabled = true;
+let bgMusic = null;
 let catalog = null;
 let catalogData = null;
 let lastResult = null;
@@ -239,6 +245,128 @@ async function init() {
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         catalog = await resp.json();
         catalogData = catalog;
+        window.catalog = catalog;
+        window.catalogData = catalogData;
+        if (catalogData) {
+            if (catalogData.scenarios && catalogData.scenarios["titan_lander"]) {
+                catalogData.scenarios["titan_lander"]["budget_m"] = 3350;
+                catalogData.scenarios["titan_lander"]["budget_cap_m"] = 3350;
+            }
+            catalogData.missions = {
+                ...catalogData.scenarios,
+                "titan_lander": {
+                    ...((catalogData.scenarios && catalogData.scenarios["titan_lander"]) || {}),
+                    "name": "Chronos: Titan Methane Sea Lander",
+                    "budget_m": 3350,
+                    "budget_cap_m": 3350,
+                }
+            };
+
+            // 1. UPGRADE THE RTG TO A TRIPLE-ARRAY
+            if (catalogData.power_systems) {
+                const rtg = catalogData.power_systems["mmrtg"] || catalogData.power_systems["multi-mission-rtg"];
+                if (rtg) {
+                    rtg.name = "Triple-RTG Array (Cassini-Class)";
+                    rtg.power_w = 1200;
+                    rtg.generated_w = 1200;
+                    rtg.base_power_w_1au = 1200;
+                    rtg.mass_kg = 150;
+                }
+            }
+
+            // 2. UPGRADE THE DSOC FOR DEEP SPACE SCALING
+            if (catalogData.comms_systems) {
+                const dsoc = catalogData.comms_systems["dsoc_laser"] || catalogData.comms_systems["dsoc"];
+                if (dsoc) {
+                    dsoc.data_rate_gb = 12000;
+                    dsoc.max_data_gb_day = 12000;
+                    dsoc.power_draw_w = 180;
+                }
+            }
+        }
+        if (catalogData && catalogData.rockets) {
+            catalogData.rockets["sls-block-2-centaur"] = {
+                "name": "NASA SLS Block 2 + Centaur III",
+                "agency": "NASA / ULA",
+                "max_leo_payload_kg": 130000,
+                "cost_m": 2500,
+                "model_glb": "sls_block_2+centaur-3.glb",
+                "stages": [
+                    {
+                        "name": "Core + Advanced Boosters",
+                        "dry_mass_kg": 150000,
+                        "prop_mass_kg": 2600000,
+                        "isp_s": 410
+                    },
+                    {
+                        "name": "Exploration Upper Stage",
+                        "dry_mass_kg": 14000,
+                        "prop_mass_kg": 97000,
+                        "isp_s": 462
+                    },
+                    {
+                        "name": "Centaur III Kick Stage",
+                        "dry_mass_kg": 2240,
+                        "prop_mass_kg": 20830,
+                        "isp_s": 450
+                    }
+                ]
+            };
+            catalogData.rockets["falcon-heavy-star48"] = {
+                "name": "SpaceX Falcon Heavy (Exp) + Star 48",
+                "agency": "SpaceX / Northrop Grumman",
+                "max_leo_payload_kg": 63800,
+                "cost_m": 115,
+                "model_glb": "falcon heavy.glb",
+                "stages": [
+                    {
+                        "name": "3x Falcon 9 Cores",
+                        "dry_mass_kg": 66000,
+                        "prop_mass_kg": 1233000,
+                        "isp_s": 282
+                    },
+                    {
+                        "name": "Upper Stage (Merlin 1D Vac)",
+                        "dry_mass_kg": 4000,
+                        "prop_mass_kg": 107500,
+                        "isp_s": 348
+                    },
+                    {
+                        "name": "Star 48BV Solid Kick Stage",
+                        "dry_mass_kg": 131,
+                        "prop_mass_kg": 2010,
+                        "isp_s": 298
+                    }
+                ]
+            };
+            catalogData.rockets["falcon-heavy-centaur"] = {
+                "name": "SpaceX Falcon Heavy + Centaur III",
+                "agency": "SpaceX / ULA",
+                "max_leo_payload_kg": 63800,
+                "cost_m": 150,
+                "model_glb": "falcon_heavy_centaur.glb",
+                "stages": [
+                    {
+                        "name": "3x Falcon 9 Cores",
+                        "dry_mass_kg": 66000,
+                        "prop_mass_kg": 1233000,
+                        "isp_s": 282
+                    },
+                    {
+                        "name": "Upper Stage (Merlin 1D Vac)",
+                        "dry_mass_kg": 4000,
+                        "prop_mass_kg": 107500,
+                        "isp_s": 348
+                    },
+                    {
+                        "name": "Centaur III Kick Stage",
+                        "dry_mass_kg": 2240,
+                        "prop_mass_kg": 20830,
+                        "isp_s": 450
+                    }
+                ]
+            };
+        }
     } catch (err) {
         console.error('[O2S] Failed to load catalog:', err);
         showError('Failed to connect to backend. Is the server running?');
@@ -261,7 +389,7 @@ function populateUI() {
     // Scenarios
     const scenarioSel = document.getElementById('scenario-select');
     Object.entries(catalog.scenarios).forEach(([key, s]) => {
-        const opt = new Option(`${s.difficulty.toUpperCase()} · ${s.name}`, key);
+        const opt = new Option(s.name, key);
         scenarioSel.appendChild(opt);
     });
     updateScenarioCard();
@@ -313,14 +441,14 @@ function populateUI() {
 
     // Load 3D model for default rocket
     const defaultRocketKey = rocketSel.value;
-    loadRocketModel(defaultRocketKey);
+    loadVehicleModel(defaultRocketKey);
     updateRocketSpecsHUD(defaultRocketKey);
 }
 
 function loadCatalog() {
     const defaultRocketKey = document.getElementById('rocket-select')?.value;
     if (defaultRocketKey) {
-        loadRocketModel(defaultRocketKey);
+        loadVehicleModel(defaultRocketKey);
         updateRocketSpecsHUD(defaultRocketKey);
     }
 }
@@ -341,7 +469,7 @@ function bindEvents() {
     document.getElementById('rocket-select').addEventListener('change', (e) => {
         const key = e.target.value;
         Audio.playClick();
-        loadRocketModel(e.target.value);
+        loadVehicleModel(e.target.value);
         updateRocketSpecsHUD(key);
         scheduleSimulation();
     });
@@ -374,7 +502,17 @@ function bindEvents() {
     });
 
     // Audio toggle
-    document.getElementById('audio-btn').addEventListener('click', () => Audio.toggle());
+    const audioToggle = document.getElementById('audio-toggle');
+    if (audioToggle) {
+        audioToggle.addEventListener('change', (e) => {
+            audioEnabled = e.target.checked;
+            if (audioEnabled && bgMusic) {
+                bgMusic.play().catch(err => console.warn("Audio autoplay blocked by browser."));
+            } else if (!audioEnabled && bgMusic) {
+                bgMusic.pause();
+            }
+        });
+    }
 
     // Launch button → animate trajectory
     document.getElementById('simulate-btn').addEventListener('click', async () => {
@@ -445,10 +583,19 @@ function updateScenarioCard() {
     if (!card) return;
     card.style.display = 'block';
 
-    const diffColor = scenario.difficulty_color || '#64748b';
+    const starCount = Math.max(1, Math.min(10, Math.ceil((scenario.required_dv_ms / 25000) * 10)));
+    
+    let starColor = '#10b981'; // Green (1-3)
+    if (starCount >= 4 && starCount <= 7) starColor = '#f59e0b'; // Orange
+    else if (starCount >= 8 && starCount <= 9) starColor = '#ef4444'; // Red
+    else if (starCount === 10) starColor = '#8b5cf6'; // Purple
+
+    const active = '★'.repeat(starCount);
+    const inactive = '☆'.repeat(10 - starCount);
+
     card.innerHTML = `
-        <div class="diff-badge" style="background:${diffColor}22;color:${diffColor};border:1px solid ${diffColor}44">
-            ${scenario.difficulty.toUpperCase()}
+        <div style="font-size: 1.4rem; margin-bottom: 8px; letter-spacing: 4px;">
+            <span style="color: ${starColor}; text-shadow: 0 0 12px ${starColor}60;">${active}</span><span style="color: #1e3a5f;">${inactive}</span>
         </div>
         <div class="sc-desc">${scenario.description}</div>
         <div class="sc-stats">
@@ -489,18 +636,24 @@ function updateRequiredMarks() {
 // ============================================================================
 // 3D Model Loader
 // ============================================================================
-function loadRocketModel(rocketKey) {
-    if (!catalog || !rocketKey || !window.VAB) return;
-    const rocket = catalog.rockets[rocketKey];
-    if (!rocket) return;
+function loadVehicleModel(vehicleId) {
+    if (!vehicleId) return;
+    const cat = catalog || catalogData || window.catalogData || window.catalog;
+    const rocket = cat?.rockets?.[vehicleId];
+    const name = rocket?.name || vehicleId;
 
-    const glbFile = rocket.model_glb;
-    // URL-encode filename to handle spaces (e.g. "falcon heavy.glb" → "falcon%20heavy.glb")
-    const url = `/3d assets/${encodeURIComponent(glbFile)}`;
-
-    document.getElementById('vab-model-name').textContent = `Loading ${rocket.name}…`;
-    window.VAB.loadModel(url, rocket.name);
+    if (window.VAB && typeof window.VAB.loadVehicleModel === 'function') {
+        window.VAB.loadVehicleModel(vehicleId, name);
+    } else if (window.VAB && typeof window.VAB.loadModel === 'function') {
+        const glbFile = rocket?.model_glb || vehicleId;
+        const url = glbFile.startsWith('/') ? glbFile : `/3d assets/${encodeURIComponent(glbFile)}`;
+        window.VAB.loadModel(url, name);
+    }
 }
+function loadRocketModel(rocketKey) {
+    loadVehicleModel(rocketKey);
+}
+window.loadVehicleModel = loadVehicleModel;
 
 // ============================================================================
 // Debounced Simulation (live reactive updates)
@@ -593,9 +746,34 @@ function buildRequest() {
 }
 
 // ============================================================================
+// Flight Readiness Review & Mission Evaluation (TWR Constraint Check)
+// ============================================================================
+function evaluateMission(rocket, warnings = []) {
+    if (!rocket || !rocket.stages) return warnings;
+    rocket.stages.forEach((stage, stageIndex) => {
+        const stageTWR = stage.twr || (stage.thrust_kn ? (stage.thrust_kn * 1000.0) / ((stage.dry_mass_kg + stage.prop_mass_kg) * 9.80665) : 1.5);
+        if (stageIndex === 0 && stageTWR < 1.0) {
+            warnings.push(`⚠ LOW TWR ${stageTWR.toFixed(2)} for '${stage.name}' — Insufficient thrust to lift combined vehicle stack off the pad`);
+        }
+    });
+    return warnings;
+}
+const runFlightReadinessReview = evaluateMission;
+
+// ============================================================================
 // Telemetry Panel Updates
 // ============================================================================
 function updateTelemetryPanel(r) {
+    // Filter out upper-stage launchpad gravity warnings (strictly only applies to stageIndex === 0)
+    if (r.warnings) {
+        r.warnings = r.warnings.filter(w => {
+            if (w.includes("insufficient thrust to lift combined vehicle stack off the pad")) {
+                return w.includes("Stage 1") || w.includes("Core") || w.includes("Booster");
+            }
+            return true;
+        });
+    }
+
     // Status banner
     const banner = document.getElementById('status-banner');
     if (banner) {
@@ -979,26 +1157,208 @@ function updateRocketSpecsHUD(rocketKey) {
     if (!catalogData || !catalogData.rockets) return;
     const rocket = catalogData.rockets[rocketKey];
     if (!rocket) return;
-    
-    document.getElementById('rocket-specs-overlay').style.display = 'block';
-    document.getElementById('hud-rocket-name').textContent = rocket.name;
-    document.getElementById('hud-rocket-agency').textContent = rocket.agency;
-    document.getElementById('hud-rocket-leo').textContent = rocket.max_leo_payload_kg.toLocaleString() + ' kg';
-    document.getElementById('hud-rocket-cost').textContent = '$' + rocket.cost_m + 'M';
-    
+
+    const overlay = document.getElementById('rocket-specs-overlay');
+    if (!overlay) return;
+    overlay.style.display = 'block';
+
+    document.getElementById('hud-rocket-name').textContent = rocket.name || "UNKNOWN VEHICLE";
+    document.getElementById('hud-rocket-agency').textContent = rocket.agency || "UNKNOWN AGENCY";
+
+    const leo = rocket.max_leo_payload_kg ? rocket.max_leo_payload_kg.toLocaleString() + ' kg' : "N/A";
+    document.getElementById('hud-rocket-leo').textContent = leo;
+
+    const cost = rocket.cost_m ? '$' + rocket.cost_m + 'M' : "N/A";
+    document.getElementById('hud-rocket-cost').textContent = cost;
+
     const stagesContainer = document.getElementById('hud-rocket-stages');
     stagesContainer.innerHTML = '<div class="hud-subtitle" style="margin-top: 12px;">Stage Breakdown</div>';
-    
-    rocket.stages.forEach((stage, idx) => {
-        stagesContainer.innerHTML += `
-            <div class="hud-stage-card">
-                <div class="hud-stage-name">Stage ${idx + 1}: ${stage.name}</div>
-                <div class="hud-stage-stats">
-                    <span>Dry: ${stage.dry_mass_kg.toLocaleString()} kg</span>
-                    <span>Prop: ${stage.prop_mass_kg.toLocaleString()} kg</span>
-                    <span>ISP: ${stage.isp_s}s</span>
+
+    if (rocket.stages && Array.isArray(rocket.stages) && rocket.stages.length > 0) {
+        rocket.stages.forEach((stage, idx) => {
+            stagesContainer.innerHTML += `
+                <div class="hud-stage-card">
+                    <div class="hud-stage-name">Stage ${idx + 1}: ${stage.name || 'Core'}</div>
+                    <div class="hud-stage-stats">
+                        <span>Dry: ${stage.dry_mass_kg ? stage.dry_mass_kg.toLocaleString() : 0} kg</span>
+                        <span>Prop: ${stage.prop_mass_kg ? stage.prop_mass_kg.toLocaleString() : 0} kg</span>
+                        <span>ISP: ${stage.isp_s || 0}s</span>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        });
+    } else {
+        stagesContainer.innerHTML += `<div class="hud-stage-card"><div class="hud-stage-stats"><span>Stage telemetry unavailable</span></div></div>`;
+    }
+}
+
+// FLIGHT DIRECTOR TUTORIAL LOGIC
+let currentTutStep = -1;
+let currentHighlight = null;
+
+const tutorialSteps = [
+    {
+        title: "Select Launch Vehicle",
+        text: "Your first decision as Flight Director. Choose a rocket from the dropdown. Heavier payloads require massive, expensive rockets.",
+        target: "rocket-select",
+        position: { top: "20%", left: "50%" }
+    },
+    {
+        title: "Analyze Vehicle Specs",
+        text: "This HUD shows Max LEO (Low Earth Orbit) capacity and Stage Breakdown. Notice how most of the mass is just Propellant (fuel).",
+        target: "rocket-specs-overlay",
+        position: { top: "40%", left: "40%" }
+    },
+    {
+        title: "Understand the Physics",
+        text: "Hover your mouse over words like 'Delta-V' or 'TWR' anywhere on screen to see the physics formulas driving this simulation.",
+        target: null, // No target, general instruction
+        position: { top: "50%", left: "50%" }
+    },
+    {
+        title: "Initiate Launch",
+        text: "When you are ready, hit Launch & Simulate. Watch the dynamic telemetry as fuel drains and Thrust-to-Weight Ratio climbs.",
+        target: "hud-launch-container",
+        position: { top: "50%", left: "50%" }
+    }
+];
+
+function advanceTutorial() {
+    if (currentHighlight) {
+        currentHighlight.classList.remove('highlight-target');
+        currentHighlight = null;
+    }
+
+    currentTutStep++;
+
+    if (currentTutStep >= tutorialSteps.length) {
+        document.getElementById('tutorial-overlay').classList.add('tut-hidden');
+        return;
+    }
+
+    const step = tutorialSteps[currentTutStep];
+    document.getElementById('tut-title').textContent = step.title;
+    document.getElementById('tut-text').textContent = step.text;
+    document.getElementById('tut-progress').textContent = `${currentTutStep + 1}/${tutorialSteps.length}`;
+
+    const dialog = document.getElementById('tutorial-dialog');
+    dialog.style.top = step.position.top;
+    dialog.style.left = step.position.left;
+
+    if (step.target) {
+        currentHighlight = document.getElementById(step.target) || document.querySelector('.' + step.target);
+        if (currentHighlight) currentHighlight.classList.add('highlight-target');
+    }
+
+    if (currentTutStep === tutorialSteps.length - 1) {
+        document.getElementById('tut-next-btn').textContent = "Begin Mission";
+        document.getElementById('tut-next-btn').style.background = "#10b981";
+    }
+}
+
+// Auto-start tutorial after 1.5 seconds on first load
+setTimeout(() => {
+    document.getElementById('tutorial-overlay').classList.remove('tut-hidden');
+    advanceTutorial();
+}, 1500);
+
+window.advanceTutorial = advanceTutorial;
+
+// AUTO-ROTATE & AUDIO STATE OVERRIDES
+if (typeof controls !== 'undefined' && controls) {
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.0; // Slow, cinematic spin
+    controls.update();
+}
+
+// OVERRIDE AUDIO STATE & INITIAL MODEL LOAD
+window.addEventListener('load', () => {
+    const rocketSel = document.getElementById('rocket-select');
+    if (rocketSel && rocketSel.value) {
+        loadVehicleModel(rocketSel.value);
+    }
+
+    setTimeout(() => {
+        const audioToggle = document.getElementById('audio-toggle') || document.querySelector('input[type="checkbox"][id*="audio"]');
+        if (audioToggle && !audioToggle.checked) {
+            audioToggle.checked = true;
+            // Dispatch event to trigger whatever internal logic listens to this switch
+            audioToggle.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+    }, 1000);
+});
+
+// DYNAMIC SCIENCE PAYLOAD TOOLTIPS
+setTimeout(() => {
+    const payloadDict = {
+        "Spectrometer": "Analyzes elemental composition and detects sub-surface water/ice deposits.",
+        "Imager": "Captures ultra-high-resolution optical images of planetary terrain.",
+        "Sounder": "Measures atmospheric temperatures, dust layers, and greenhouse gases.",
+        "Radar": "Fires radio waves deep underground to map hidden ice layers and bedrock.",
+        "Magnetometer": "Measures the planetary magnetic field and solar wind interactions.",
+        "Altimeter": "Uses laser pulses to create highly accurate 3D topographic maps.",
+        "Chromatograph": "Bakes soil/atmosphere samples to detect complex organic life-building molecules.",
+        "Micro-Rover": "A small autonomous surface vehicle for localized terrain sampling.",
+        "Solar": "Photovoltaic power generation. Useless in deep space (past Jupiter).",
+        "RTG": "Nuclear battery (Plutonium-238). Generates heat and power in deep space.",
+        "Patch Antenna": "Low-frequency, omnidirectional. Very slow data transfer.",
+        "High Gain": "Parabolic dish. Fast data transfer, but must be pointed exactly at Earth.",
+        "DSOC": "Deep Space Optical Comm. Uses lasers for fiber-optic-level speeds in space."
+    };
+
+    // Target the labels containing the checkboxes
+    document.querySelectorAll('.science-payload-item, label, .payload-checkbox-container').forEach(el => {
+        const text = el.textContent;
+        for (const [key, desc] of Object.entries(payloadDict)) {
+            if (text.includes(key) && !el.classList.contains('edu-tooltip')) {
+                el.classList.add('edu-tooltip');
+                el.setAttribute('data-title', desc);
+            }
+        }
+    });
+}, 1200);
+
+// DYNAMIC SMART TOOLTIP ENGINE (EVENT DELEGATION)
+const globalTooltip = document.getElementById('global-smart-tooltip');
+if (globalTooltip) {
+    document.addEventListener('mouseover', (e) => {
+        const el = e.target.closest('.edu-tooltip');
+        if (!el) return;
+        
+        const text = el.getAttribute('title') || el.getAttribute('data-title');
+        if (!text) return;
+        
+        // Suppress native OS browser tooltip
+        if (el.hasAttribute('title')) {
+            el.setAttribute('data-title', text);
+            el.removeAttribute('title');
+        }
+
+        globalTooltip.innerHTML = text;
+        globalTooltip.style.opacity = '1';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (globalTooltip.style.opacity === '0') return;
+        const el = e.target.closest('.edu-tooltip');
+        if (!el) return;
+
+        let x = e.clientX + 15;
+        let y = e.clientY + 15;
+        
+        const box = globalTooltip.getBoundingClientRect();
+        
+        // Prevent screen-edge clipping
+        if (x + box.width > window.innerWidth) x = e.clientX - box.width - 15;
+        if (y + box.height > window.innerHeight) y = e.clientY - box.height - 15;
+
+        globalTooltip.style.left = x + 'px';
+        globalTooltip.style.top = y + 'px';
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        if (e.target.closest('.edu-tooltip')) {
+            globalTooltip.style.opacity = '0';
+        }
     });
 }

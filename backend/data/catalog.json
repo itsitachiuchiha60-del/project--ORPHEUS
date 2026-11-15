@@ -8,7 +8,7 @@
       "target_body": "Moon",
       "regime": "Lunar Surface",
       "solar_distance_au": 1.0,
-      "budget_cap_m": 220,
+      "budget_cap_m": 400,
       "min_science_points": 250,
       "required_instruments": ["neutron_spec"],
       "required_dv_ms": 15320,
@@ -35,7 +35,7 @@
       "target_body": "Mars",
       "regime": "Low Mars Orbit",
       "solar_distance_au": 1.52,
-      "budget_cap_m": 320,
+      "budget_cap_m": 700,
       "min_science_points": 450,
       "required_instruments": ["hirise_cam", "atmo_sounder"],
       "required_dv_ms": 14850,
@@ -62,7 +62,7 @@
       "target_body": "Venus",
       "regime": "Venus Orbit / Atmospheric Probe",
       "solar_distance_au": 0.72,
-      "budget_cap_m": 290,
+      "budget_cap_m": 750,
       "min_science_points": 400,
       "required_instruments": ["atmo_sounder", "lidar"],
       "required_dv_ms": 15200,
@@ -89,7 +89,7 @@
       "target_body": "Jupiter (Europa)",
       "regime": "Jovian Capture & Europa Flyby",
       "solar_distance_au": 5.2,
-      "budget_cap_m": 650,
+      "budget_cap_m": 5000,
       "min_science_points": 700,
       "required_instruments": ["ice_radar", "mag_plasma"],
       "required_dv_ms": 18900,
@@ -116,7 +116,8 @@
       "target_body": "Saturn (Titan)",
       "regime": "Titan Surface / Sea Landing",
       "solar_distance_au": 9.5,
-      "budget_cap_m": 950,
+      "budget_cap_m": 3350,
+      "budget_m": 3350,
       "min_science_points": 850,
       "required_instruments": ["mass_spec", "micro_rover"],
       "required_dv_ms": 21500,
@@ -134,6 +135,57 @@
       "semi_major_axis_au": 5.275,
       "eccentricity": 0.810,
       "target_orbit_km": 1500
+    },
+    "leo_resupply": {
+      "name": "Commercial Resupply: Low Earth Orbit",
+      "description": "Deliver a pressurized cargo module to the International Space Station at 400km altitude. A routine but strictly mass-sensitive mission.",
+      "target_body": "Earth (LEO)",
+      "regime": "Low Earth Orbit",
+      "solar_distance_au": 1.0,
+      "budget_cap_m": 150,
+      "min_science_points": 0,
+      "required_instruments": [],
+      "required_dv_ms": 9600,
+      "view_mode": "earth_moon",
+      "burn_budget": {
+        "dv_leo_ms": 9400, "dv_injection_ms": 200, "dv_capture_ms": 0, "dv_descent_ms": 0,
+        "injection_label": "Orbital Phasing", "capture_label": null, "descent_label": null
+      },
+      "transfer_time_days": 0.1, "semi_major_axis_au": 0.0, "eccentricity": 0.0
+    },
+    "geo_comms": {
+      "name": "Geostationary Communications Relay",
+      "description": "Deploy a massive high-throughput military communications satellite to Geostationary Orbit (35,786 km). Requires a highly efficient upper stage for the GTO circularization burn.",
+      "target_body": "Earth (GEO)",
+      "regime": "Geostationary Orbit",
+      "solar_distance_au": 1.0,
+      "budget_cap_m": 400,
+      "min_science_points": 0,
+      "required_instruments": ["s_band_omni"],
+      "required_dv_ms": 11800,
+      "view_mode": "earth_moon",
+      "burn_budget": {
+        "dv_leo_ms": 9400, "dv_injection_ms": 2400, "dv_capture_ms": 0, "dv_descent_ms": 0,
+        "injection_label": "GTO Transfer", "capture_label": null, "descent_label": null
+      },
+      "transfer_time_days": 0.5, "semi_major_axis_au": 0.0, "eccentricity": 0.73
+    },
+    "isro_aditya": {
+      "name": "Aditya-L1: Solar Observatory",
+      "description": "Place a solar observatory in a halo orbit around the Sun-Earth Lagrange point 1 (L1), 1.5 million kilometers from Earth. Demands precise orbital insertion.",
+      "target_body": "Sun-Earth L1",
+      "regime": "Lagrange Point Halo Orbit",
+      "solar_distance_au": 0.99,
+      "budget_cap_m": 50,
+      "min_science_points": 150,
+      "required_instruments": ["mag_plasma", "hirise_cam"],
+      "required_dv_ms": 12800,
+      "view_mode": "earth_moon",
+      "burn_budget": {
+        "dv_leo_ms": 9400, "dv_injection_ms": 3400, "dv_capture_ms": 0, "dv_descent_ms": 0,
+        "injection_label": "Earth Escape Burn", "capture_label": null, "descent_label": null
+      },
+      "transfer_time_days": 110, "semi_major_axis_au": 0.01, "eccentricity": 0.98
     }
   },
 
@@ -142,7 +194,7 @@
       "name": "ISRO PSLV-C40 / PSLV-XL",
       "agency": "ISRO",
       "country": "India",
-      "cost_m": 28,
+      "cost_m": 25,
       "max_leo_payload_kg": 1750,
       "model_glb": "pslv_c40.glb",
       "description": "India's workhorse 4-stage polar launch vehicle. Proven record of 50+ missions. Ideal for small science payloads to GTO or escape trajectories using its upper kick stage.",
@@ -186,9 +238,9 @@
       "name": "ISRO LVM3 (Bahubali / GSLV Mk III)",
       "agency": "ISRO",
       "country": "India",
-      "cost_m": 65,
+      "cost_m": 50,
       "max_leo_payload_kg": 8000,
-      "model_glb": "gslv_mk_iii.glb",
+      "model_glb": "gslv_mk3.glb",
       "description": "India's most powerful operational launch vehicle. Cryogenic C25 upper stage enables GTO and interplanetary missions. The LVM3-M2 OneWeb mission demonstrated commercial viability.",
       "stages": [
         {
@@ -282,11 +334,83 @@
       ]
     },
 
+    "falcon-heavy-star48": {
+      "name": "SpaceX Falcon Heavy (Exp) + Star 48",
+      "agency": "SpaceX / Northrop Grumman",
+      "country": "USA",
+      "cost_m": 160,
+      "max_leo_payload_kg": 63800,
+      "model_glb": "falcon heavy.glb",
+      "description": "SpaceX Falcon Heavy fully expendable configuration with a Northrop Grumman Star 48BV solid-propellant kick stage for high characteristic energy (C3) planetary injection.",
+      "stages": [
+        {
+          "name": "3x Falcon 9 Cores",
+          "dry_mass_kg": 66000,
+          "prop_mass_kg": 1233000,
+          "isp_s": 282,
+          "thrust_kn": 22820,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Upper Stage (Merlin 1D Vac)",
+          "dry_mass_kg": 4000,
+          "prop_mass_kg": 107500,
+          "isp_s": 348,
+          "thrust_kn": 934,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Star 48BV Solid Kick Stage",
+          "dry_mass_kg": 131,
+          "prop_mass_kg": 2010,
+          "isp_s": 298,
+          "thrust_kn": 68,
+          "propellant": "HTPB Solid"
+        }
+      ]
+    },
+
+    "falcon-heavy-centaur": {
+      "name": "SpaceX Falcon Heavy + Centaur III",
+      "agency": "SpaceX / ULA",
+      "country": "USA",
+      "cost_m": 180,
+      "max_leo_payload_kg": 63800,
+      "model_glb": "falcon_heavy_centaur.glb",
+      "description": "SpaceX Falcon Heavy with a ULA Centaur III cryogenic upper/kick stage utilizing RL10 liquid hydrogen/oxygen propulsion for extreme high-energy deep space missions.",
+      "stages": [
+        {
+          "name": "3x Falcon 9 Cores",
+          "dry_mass_kg": 66000,
+          "prop_mass_kg": 1233000,
+          "isp_s": 282,
+          "thrust_kn": 22820,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Upper Stage (Merlin 1D Vac)",
+          "dry_mass_kg": 4000,
+          "prop_mass_kg": 107500,
+          "isp_s": 348,
+          "thrust_kn": 934,
+          "propellant": "RP-1 / LOX"
+        },
+        {
+          "name": "Centaur III Kick Stage",
+          "dry_mass_kg": 2240,
+          "prop_mass_kg": 20830,
+          "isp_s": 450,
+          "thrust_kn": 99,
+          "propellant": "LH₂ / LOX"
+        }
+      ]
+    },
+
     "sls_block1b": {
       "name": "NASA SLS Block 1B (Exploration Upper Stage)",
       "agency": "NASA / Boeing",
       "country": "USA",
-      "cost_m": 2000,
+      "cost_m": 2200,
       "max_leo_payload_kg": 95000,
       "model_glb": "low_poly_-_nasa_artemis_ii_sls_rocket.glb",
       "description": "The Space Launch System Block 1B with Exploration Upper Stage is the most powerful rocket ever flown, surpassing Saturn V in payload to deep space. At $2B per launch it is reserved for the heaviest flagship science missions and crewed Artemis deep-space exploration.",
@@ -310,13 +434,49 @@
       ]
     },
 
+    "sls-block-2-centaur": {
+      "name": "NASA SLS Block 2 + Centaur III",
+      "agency": "NASA / ULA",
+      "country": "USA",
+      "cost_m": 2500,
+      "max_leo_payload_kg": 130000,
+      "model_glb": "sls_block_2+centaur-3.glb",
+      "description": "NASA's supreme deep-space configuration: Space Launch System Block 2 with Advanced Boosters, Exploration Upper Stage, and a Centaur III cryogenic kick stage. Provides the extreme high-energy C3 and >21,500 m/s Delta-V needed for direct injection to the Saturn system.",
+      "stages": [
+        {
+          "name": "Core + Advanced Boosters",
+          "dry_mass_kg": 150000,
+          "prop_mass_kg": 2600000,
+          "isp_s": 410,
+          "thrust_kn": 42000,
+          "propellant": "LH₂ / LOX + Adv SRBs"
+        },
+        {
+          "name": "Exploration Upper Stage",
+          "dry_mass_kg": 14000,
+          "prop_mass_kg": 97000,
+          "isp_s": 462,
+          "thrust_kn": 445,
+          "propellant": "LH₂ / LOX"
+        },
+        {
+          "name": "Centaur III Kick Stage",
+          "dry_mass_kg": 2240,
+          "prop_mass_kg": 20830,
+          "isp_s": 450,
+          "thrust_kn": 99.2,
+          "propellant": "LH₂ / LOX"
+        }
+      ]
+    },
+
     "new_glenn": {
       "name": "Blue Origin New Glenn (Expendable)",
       "agency": "Blue Origin",
       "country": "USA",
-      "cost_m": 67,
+      "cost_m": 120,
       "max_leo_payload_kg": 45000,
-      "model_glb": "new_glenn.glb",
+      "model_glb": "blue_origin_new_glenn.glb",
       "description": "Blue Origin's heavy-lift rocket powered by 7 BE-4 methalox engines on the first stage and two BE-3U LH₂ engines on the second stage. Its 7-meter fairing is the largest commercial fairing diameter, accommodating oversized payloads and large solar arrays without folding.",
       "stages": [
         {
@@ -342,7 +502,7 @@
       "name": "Rocket Lab Electron",
       "agency": "Rocket Lab",
       "country": "USA / New Zealand",
-      "cost_m": 7.5,
+      "cost_m": 8,
       "max_leo_payload_kg": 300,
       "model_glb": "electron_-_rocket_lab.glb",
       "description": "The premier small satellite launch vehicle. Electron's 9 electric-pump-fed Rutherford engines and 3D-printed components make it the most capable small launcher. Its Kick Stage (Curie engine) can target precise orbital inclinations and deliver payloads to MEO, GTO, or beyond.",
@@ -378,7 +538,7 @@
       "name": "CNSA Long March 5 (CZ-5)",
       "agency": "CASC / CALT",
       "country": "China",
-      "cost_m": 55,
+      "cost_m": 130,
       "max_leo_payload_kg": 25000,
       "model_glb": "long_march_5_rocket.glb",
       "description": "China's most powerful operational rocket, powered by twin cryogenic YF-77 engines on the 5m-diameter core and four kerosene-fueled YF-100 strap-on boosters. Launched Tianwen-1 to Mars, Chang'e-5 lunar sample return, and Wentian / Mengtian space station modules.",
@@ -406,7 +566,7 @@
       "name": "Saturn V (Historic / Museum Grade)",
       "agency": "NASA / Boeing",
       "country": "USA",
-      "cost_m": 1500,
+      "cost_m": 2800,
       "max_leo_payload_kg": 140000,
       "model_glb": "Saturn V.glb",
       "description": "The mightiest rocket in history. 13 flights, 13 successes. Five F-1 engines generating 34.5 MN of thrust thunder 140 tonnes to LEO. Its S-IVB third stage sent 48,500 kg toward the Moon. Use it when only the absolute maximum ΔV reserve is acceptable — if budget is no object.",
@@ -468,13 +628,15 @@
       "description": "Circular Ultraflex panels (as used on Phoenix, InSight). Highest specific power (W/kg) of any solar technology. Still subject to 1/r² inverse-square law — marginally functional at Jupiter but completely inadequate at Saturn."
     },
     "mmrtg": {
-      "name": "Multi-Mission RTG (Pu-238 Nuclear)",
+      "name": "Triple-RTG Array (Cassini-Class)",
       "type": "nuclear",
-      "mass_kg": 145,
+      "mass_kg": 150,
       "cost_m": 85,
-      "base_power_w_1au": 450,
+      "base_power_w_1au": 1200,
+      "power_w": 1200,
+      "generated_w": 1200,
       "efficiency_pct": 6,
-      "description": "Multi-Mission Radioisotope Thermoelectric Generator using 4.8 kg of Pu-238 dioxide. Constant 450 W output at any solar distance — from Venus to Pluto. As used on Cassini, Curiosity, Perseverance, New Horizons, and Voyager. The only viable power source beyond ~3 AU. Output degrades ~0.8% per year."
+      "description": "Multi-Mission Radioisotope Thermoelectric Generator using 4.8 kg of Pu-238 dioxide. Constant 1200 W output at any solar distance — from Venus to Pluto. As used on Cassini, Curiosity, Perseverance, New Horizons, and Voyager. The only viable power source beyond ~3 AU. Output degrades ~0.8% per year."
     }
   },
 
@@ -510,8 +672,9 @@
       "name": "DSOC — Deep Space Optical Communications Laser",
       "mass_kg": 130,
       "cost_m": 120,
-      "power_draw_w": 240,
-      "max_data_gb_day": 1200,
+      "power_draw_w": 180,
+      "max_data_gb_day": 12000,
+      "data_rate_gb": 12000,
       "frequency_ghz": 282000,
       "description": "NASA's Deep Space Optical Communications terminal (as demonstrated on Psyche, 2024). Laser photon-based link achieves 100× the downlink rate of Ka-band RF. The photon-counting detector tolerates planetary distances. Required for Jovian-class missions with multi-gigabyte daily science volumes. Very high cost and strict pointing requirements."
     }

@@ -19,12 +19,14 @@ const VAB = (() => {
     // -----------------------------------------------------------------------
     let renderer, scene, camera, controls;
     let currentModel = null;
+    let activeRocket = null;
+    let pedestalMesh = null;
     let autoRotate = false;
     let animationId = null;
     let isInitialized = false;
 
     const NORMALIZED_HEIGHT = 14;   // scene units for any rocket model
-    const BASE_Y = -5;              // y-position of rocket bottom-center
+    const BASE_Y = 0;              // y-position of rocket bottom-center
 
     // -----------------------------------------------------------------------
     // Initialization
@@ -55,6 +57,8 @@ const VAB = (() => {
 
         // Orbit Controls
         controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.autoRotate = true;
+        controls.autoRotateSpeed = 1.0; // Slow, cinematic spin
         controls.enableDamping = true;
         controls.dampingFactor = 0.07;
         controls.minDistance = 5;
@@ -184,6 +188,8 @@ const VAB = (() => {
         pad.position.y = BASE_Y - 0.15;
         pad.receiveShadow = true;
         scene.add(pad);
+        pedestalMesh = pad;
+        window.pedestalMesh = pad;
 
         // Flame trench hint lines
         const trenchMat = new THREE.LineBasicMaterial({ color: 0x2a4060 });
@@ -200,80 +206,157 @@ const VAB = (() => {
     }
 
     // -----------------------------------------------------------------------
+    // Vehicle Model Mapping & Asset Resolution
+    // -----------------------------------------------------------------------
+    const rocketAssets = {
+        // Dropdown HTML mapping
+        "pslv": "/3d assets/pslv.glb",
+        "lvm3": "/3d assets/lvm3.glb",
+        "sls": "/3d assets/sls_centaur.glb",
+        "falcon_heavy": "/3d assets/falcon_heavy_centaur.glb",
+        "falcon_heavy_exp": "/3d assets/falcon_heavy_star48.glb",
+
+        // Exact catalog HTML option values
+        "pslv_xl": "/3d assets/pslv.glb",
+        "sls-block-2-centaur": "/3d assets/sls_centaur.glb",
+        "sls_centaur": "/3d assets/sls_centaur.glb",
+        "falcon-heavy-centaur": "/3d assets/falcon_heavy_centaur.glb",
+        "falcon-heavy-star48": "/3d assets/falcon_heavy_star48.glb",
+        "falcon_heavy_star48": "/3d assets/falcon_heavy_star48.glb",
+        "falcon-heavy": "/3d assets/falcon%20heavy.glb",
+        "falcon_9": "/3d assets/spacex_falcon_9_block_5.glb",
+        "falcon-9": "/3d assets/spacex_falcon_9_block_5.glb",
+        "sls_block1b": "/3d assets/low_poly_-_nasa_artemis_ii_sls_rocket.glb",
+        "sls-block1b": "/3d assets/low_poly_-_nasa_artemis_ii_sls_rocket.glb",
+        "new_glenn": "/3d assets/blue_origin_new_glenn.glb",
+        "new-glenn": "/3d assets/blue_origin_new_glenn.glb",
+        "electron": "/3d assets/electron_-_rocket_lab.glb",
+        "long_march_5": "/3d assets/long_march_5_rocket.glb",
+        "long-march-5": "/3d assets/long_march_5_rocket.glb",
+        "saturn_v": "/3d assets/Saturn%20V.glb",
+        "saturn-v": "/3d assets/Saturn%20V.glb"
+    };
+
+    const VEHICLE_GLB_MAP = rocketAssets;
+
+    // Clean scene disposal to prevent WebGL memory leaks
+    function _disposeModel(model) {
+        if (!model) return;
+        scene.remove(model);
+        model.traverse((child) => {
+            if (child.isMesh) {
+                if (child.geometry) {
+                    child.geometry.dispose();
+                }
+                if (child.material) {
+                    const cleanMat = (mat) => {
+                        mat.dispose();
+                        if (mat.map) mat.map.dispose();
+                        if (mat.normalMap) mat.normalMap.dispose();
+                    };
+                    if (Array.isArray(child.material)) child.material.forEach(cleanMat);
+                    else cleanMat(child.material);
+                }
+            }
+        });
+    }
+
+    function resolveVehicleUrl(vehicleId) {
+        if (!vehicleId) return null;
+        if (typeof vehicleId === 'string' && (vehicleId.endsWith('.glb') || vehicleId.startsWith('/'))) {
+            return vehicleId.startsWith('/') ? vehicleId : `/3d assets/${encodeURIComponent(vehicleId)}`;
+        }
+        if (rocketAssets[vehicleId]) {
+            return rocketAssets[vehicleId];
+        }
+        const cat = window.catalogData || window.catalog;
+        if (cat && cat.rockets && cat.rockets[vehicleId] && cat.rockets[vehicleId].model_glb) {
+            const glb = cat.rockets[vehicleId].model_glb;
+            return rocketAssets[glb] || `/3d assets/${encodeURIComponent(glb)}`;
+        }
+        return null;
+    }
+
+    // -----------------------------------------------------------------------
     // Model Loading & Auto-Normalization
     // -----------------------------------------------------------------------
-    function loadModel(glbUrl, rocketName) {
-        const label = document.getElementById('vab-model-name');
-        if (label) label.textContent = `Loading ${rocketName}…`;
+    function loadVehicleModel(vehicleId) {
+        const assetPath = resolveVehicleUrl(vehicleId);
+        if (!assetPath) return;
 
-        // Remove previous model
-        if (currentModel) {
-            scene.remove(currentModel);
-            currentModel = null;
+        const vabName = document.getElementById('vab-model-name');
+        if (vabName) {
+            const cat = window.catalogData || window.catalog;
+            vabName.textContent = cat?.rockets?.[vehicleId]?.name || vehicleId;
         }
 
-        const loader = new THREE.GLTFLoader();
-        loader.load(
-            glbUrl,
-            (gltf) => {
-                const model = gltf.scene;
-
-                // --- Auto-Normalize: Box3 bounding box ---
-                const box = new THREE.Box3().setFromObject(model);
-                const size = box.getSize(new THREE.Vector3());
-                const center = box.getCenter(new THREE.Vector3());
-
-                // Scale to NORMALIZED_HEIGHT
-                const modelHeight = size.y;
-                if (modelHeight > 0) {
-                    const scale = NORMALIZED_HEIGHT / modelHeight;
-                    model.scale.setScalar(scale);
-                }
-
-                // Re-compute bounding box after scaling
-                const box2 = new THREE.Box3().setFromObject(model);
-                const bottom = box2.min.y;
-                const centerXZ = box2.getCenter(new THREE.Vector3());
-
-                // Translate: bottom-center to (0, BASE_Y, 0)
-                model.position.set(
-                    -centerXZ.x,
-                    BASE_Y - bottom,
-                    -centerXZ.z
-                );
-
-                // Enable shadows on all meshes
-                model.traverse(child => {
+        const loader = new THREE.GLTFLoader(); 
+        loader.load(assetPath, function(gltf) {
+            // 1. ASYNC-SAFE GHOST CLEARING
+            let stuckRocket;
+            while ((stuckRocket = scene.getObjectByName("ROCKET_ASSET"))) {
+                scene.remove(stuckRocket);
+                stuckRocket.traverse((child) => {
                     if (child.isMesh) {
-                        child.castShadow = true;
-                        child.receiveShadow = true;
-                        // Enhance existing materials
+                        if (child.geometry) child.geometry.dispose();
                         if (child.material) {
-                            const mats = Array.isArray(child.material) ? child.material : [child.material];
-                            mats.forEach(mat => {
-                                if (mat.isMeshStandardMaterial || mat.isMeshPhysicalMaterial) {
-                                    mat.envMapIntensity = 0.8;
-                                }
-                            });
+                            const cleanMat = (mat) => {
+                                mat.dispose();
+                                if (mat.map) mat.map.dispose();
+                                if (mat.normalMap) mat.normalMap.dispose();
+                            };
+                            if (Array.isArray(child.material)) child.material.forEach(cleanMat);
+                            else cleanMat(child.material);
                         }
                     }
                 });
-
-                currentModel = model;
-                scene.add(model);
-
-                if (label) label.textContent = rocketName;
-
-                // Reset camera to full-stack view
-                setPreset('full');
-            },
-            undefined,
-            (error) => {
-                console.warn(`[VAB] GLTFLoader failed for ${glbUrl}:`, error);
-                _buildProceduralRocket(rocketName);
-                if (label) label.textContent = `${rocketName} (Procedural)`;
             }
-        );
+
+            const model = gltf.scene;
+            model.name = "ROCKET_ASSET";
+
+            // 2. ROOT-ONLY SCALING
+            const rawBox = new THREE.Box3().setFromObject(model);
+            const rawHeight = rawBox.max.y - rawBox.min.y;
+            
+            if (rawHeight > 0) {
+                model.scale.setScalar(NORMALIZED_HEIGHT / rawHeight);
+                model.updateMatrixWorld(true);
+            }
+
+            // 3. TRUE GEOMETRIC CENTERING (Fixes sinking/floating)
+            const scaledBox = new THREE.Box3().setFromObject(model);
+            const center = scaledBox.getCenter(new THREE.Vector3());
+            
+            // Shift visual center to absolute X/Z zero
+            // Shift absolute lowest geometry point to exact BASE_Y pedestal top
+            model.position.set(-center.x, BASE_Y - scaledBox.min.y, -center.z);
+
+            // 4. PBR MATERIAL SAFEGUARD
+            model.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    if (child.material.map) child.material.map.colorSpace = THREE.SRGBColorSpace;
+                    child.material.metalness = Math.min(child.material.metalness || 0, 0.3);
+                    child.material.roughness = Math.max(child.material.roughness || 0, 0.4);
+                    child.material.needsUpdate = true;
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
+            currentModel = model;
+            activeRocket = model;
+            window.activeRocket = model;
+
+            scene.add(model);
+        }, undefined, function(error) {
+            console.error("[O2S] GLTF Load Error:", error);
+        });
+    }
+
+    function loadModel(glbUrl, rocketName) {
+        if (!glbUrl) return;
+        loadVehicleModel(glbUrl, rocketName);
     }
 
     // -----------------------------------------------------------------------
@@ -281,7 +364,7 @@ const VAB = (() => {
     // -----------------------------------------------------------------------
     function _buildProceduralRocket(name) {
         if (currentModel) {
-            scene.remove(currentModel);
+            _disposeModel(currentModel);
             currentModel = null;
         }
 
@@ -365,8 +448,11 @@ const VAB = (() => {
             group.position.y = BASE_Y - box.min.y * scale;
         }
 
+        activeRocket = group;
         currentModel = group;
+        window.activeRocket = group;
         scene.add(group);
+        group.name = "ROCKET_ASSET";
         setPreset('full');
     }
 
@@ -457,7 +543,9 @@ const VAB = (() => {
     // -----------------------------------------------------------------------
     function _animate() {
         animationId = requestAnimationFrame(_animate);
-        controls.update();
+        if (typeof controls !== 'undefined' && controls) {
+            controls.update();
+        }
 
         // Subtle model rotation when not in auto-rotate mode
         if (currentModel && !autoRotate) {
@@ -471,13 +559,31 @@ const VAB = (() => {
     // -----------------------------------------------------------------------
     // Public API
     // -----------------------------------------------------------------------
-    return { init, loadModel, setPreset };
+    return {
+        init,
+        loadModel,
+        loadVehicleModel,
+        setPreset,
+        resolveVehicleUrl,
+        VEHICLE_GLB_MAP,
+        get activeRocket() { return activeRocket; },
+        set activeRocket(val) { activeRocket = val; }
+    };
 })();
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     VAB.init('webgl-container');
+
+    // STEP 4: BIND THE EVENT LISTENER
+    const sel = document.getElementById('rocket-select') || document.getElementById('launch-vehicle-select');
+    if (sel) {
+        sel.addEventListener('change', function(e) {
+            loadVehicleModel(e.target.value);
+        });
+    }
 });
 
 // Export for app.js
 window.VAB = VAB;
+window.loadVehicleModel = (vehicleId, name) => VAB.loadVehicleModel(vehicleId, name);

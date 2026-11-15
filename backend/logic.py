@@ -99,13 +99,14 @@ def calculate_multistage_dv(stages: list, payload_mass_kg: float) -> tuple[float
         stage_dv = stage["isp_s"] * G0 * math.log(mass_ratio)
         total_raw_dv += stage_dv
 
-        # Thrust-to-Weight Ratio check at stage ignition
+        # Thrust-to-Weight Ratio check at stage ignition (pad liftoff check strictly for stage 0)
         twr_warning = None
         if "thrust_kn" in stage and stage["thrust_kn"] > 0:
-            twr = (stage["thrust_kn"] * 1000.0) / (m_initial * G0)
-            if twr < 1.15:
+            stageIndex = i
+            stageTWR = (stage["thrust_kn"] * 1000.0) / (m_initial * G0)
+            if stageIndex == 0 and stageTWR < 1.0:
                 twr_warning = (
-                    f"⚠ LOW TWR {twr:.2f} for '{stage['name']}' — "
+                    f"⚠ LOW TWR {stageTWR:.2f} for '{stage['name']}' — "
                     f"insufficient thrust to lift combined vehicle stack off the pad"
                 )
 
@@ -392,11 +393,12 @@ def compute_power_balance(
     Solar panels: P_avail = P_1AU / r²       (inverse-square law)
     RTG/Nuclear:  P_avail = P_1AU             (independent of solar distance)
     """
-    if power_sys["type"] == "solar":
-        available = power_sys["base_power_w_1au"] / (r_au ** 2)
+    base_p = power_sys.get("base_power_w_1au") or power_sys.get("power_w") or power_sys.get("generated_w") or 0.0
+    if power_sys.get("type") == "solar":
+        available = float(base_p) / (r_au ** 2)
     else:
-        # Nuclear (MMRTG) — constant regardless of solar distance
-        available = float(power_sys["base_power_w_1au"])
+        # Nuclear (MMRTG / Triple-RTG) — constant regardless of solar distance
+        available = float(base_p)
 
     required = (
         BASE_BUS_POWER_W
@@ -423,7 +425,7 @@ def compute_link_budget(
     For Earth-Moon mode the range penalty is negligible (~0.003 AU).
     """
     view_mode = scenario.get("view_mode", "solar_system")
-    raw_capacity = comms_sys["max_data_gb_day"]
+    raw_capacity = comms_sys.get("max_data_gb_day") or comms_sys.get("data_rate_gb") or 0.0
 
     if view_mode == "solar_system":
         # Apply inverse-square link margin loss (approximation of free-space path loss)
@@ -631,11 +633,16 @@ def evaluate_mission(
             )
 
         # MISSING MANDATORY SCIENCE INSTRUMENT
-        missing_instruments = [
-            catalog["instruments"][key]["name"]
-            for key in scenario["required_instruments"]
-            if key not in selected_inst_keys
-        ]
+        missing_instruments = []
+        for key in scenario.get("required_instruments", []):
+            if key in catalog.get("instruments", {}):
+                if key not in selected_inst_keys:
+                    missing_instruments.append(catalog["instruments"][key]["name"])
+            elif key in catalog.get("comms_systems", {}):
+                if key != comms_key:
+                    missing_instruments.append(catalog["comms_systems"][key]["name"])
+            elif key not in selected_inst_keys:
+                missing_instruments.append(key)
         if missing_instruments:
             failures.append(
                 f"🚨 MISSING MANDATORY PAYLOAD: Mission objective '{scenario['name']}' "

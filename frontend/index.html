@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>O2S: Mission Architect | NASA Space Apps 2026</title>
+    <title>ORPHEUS: Mission Architect | NASA Space Apps 2026</title>
     <style>
         :root {
             --bg-dark: #060b18;
@@ -645,11 +645,7 @@
             transition: opacity 0.18s ease, visibility 0.18s ease;
             z-index: 1000;
         }
-        .edu-tooltip:hover::after,
-        .edu-tooltip:hover::before {
-            opacity: 1;
-            visibility: visible;
-        }
+
         /* When tooltip would overflow left edge, nudge right */
         .edu-tooltip.tip-right::after { left: 0; transform: none; }
         .edu-tooltip.tip-right::before { left: 14px; transform: none; }
@@ -665,6 +661,98 @@
         .hud-stage-card { background: rgba(0,0,0,0.4); border: 1px solid #1f2937; padding: 10px; border-radius: 6px; margin-bottom: 8px; }
         .hud-stage-name { font-weight: 600; color: #10b981; font-size: 0.85rem; margin-bottom: 6px; }
         .hud-stage-stats { display: flex; justify-content: space-between; font-size: 0.75rem; color: #d1d5db; }
+
+        /* HUD LAUNCH BUTTON CONTAINER - BOTTOM LEFT */
+        #hud-launch-container { position: absolute; bottom: 24px; left: 24px; z-index: 20; width: auto; white-space: nowrap; pointer-events: auto; }
+        #hud-launch-container button { padding: 14px 32px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; background: #dc2626; color: white; border: 1px solid #f87171; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 15px rgba(220, 38, 38, 0.4); transition: all 0.2s ease; }
+        #hud-launch-container button:hover { background: #ef4444; transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6); }
+
+        /* TUTORIAL STYLES */
+        .tut-hidden { display: none !important; }
+        #tutorial-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 100000; pointer-events: none; }
+        #tutorial-mask { position: absolute; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); pointer-events: auto; }
+        #tutorial-dialog { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 400px; background: rgba(17, 24, 39, 0.95); border: 2px solid #3b82f6; border-radius: 8px; padding: 20px; color: #fff; box-shadow: 0 0 30px rgba(59, 130, 246, 0.5); pointer-events: auto; transition: all 0.3s ease; }
+        .tut-header { font-size: 0.7rem; color: #10b981; letter-spacing: 2px; margin-bottom: 10px; border-bottom: 1px solid #374151; padding-bottom: 5px; }
+        #tut-title { color: #60a5fa; margin: 0 0 10px 0; font-size: 1.2rem; text-transform: uppercase; }
+        #tut-text { font-size: 0.9rem; color: #d1d5db; line-height: 1.5; margin-bottom: 20px; min-height: 45px; }
+        .tut-footer { display: flex; justify-content: space-between; align-items: center; }
+        #tut-progress { font-size: 0.8rem; color: #9ca3af; font-weight: bold; }
+        #tut-next-btn { background: #2563eb; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+        #tut-next-btn:hover { background: #3b82f6; }
+        /* TUTORIAL HIGHLIGHT - PATCHED */
+        .highlight-target { z-index: 100001 !important; box-shadow: 0 0 0 4px #3b82f6, 0 0 20px rgba(59, 130, 246, 0.8) !important; border-radius: 4px; pointer-events: auto; }
+        #rocket-specs-overlay.highlight-target { position: absolute !important; background: rgba(17, 24, 39, 0.95); }
+        #rocket-select.highlight-target { position: relative !important; }
+        #global-smart-tooltip { position: fixed; background: rgba(17, 24, 39, 0.95); border: 1px solid #3b82f6; padding: 12px; border-radius: 6px; color: #fff; z-index: 999999; font-size: 0.85rem; box-shadow: 0 10px 25px rgba(0,0,0,0.8); pointer-events: none; opacity: 0; transition: opacity 0.1s ease; max-width: 280px; word-wrap: break-word; font-family: system-ui, sans-serif; text-transform: none; font-weight: normal; line-height: 1.4; }
+
+        /* LAUNCH BUTTON - YELLOW CIRCLE POSITIONING */
+        .launch-btn, #launch-btn {
+            position: absolute !important;
+            bottom: 24px !important;
+            left: 24px !important;
+            z-index: 100 !important;
+            width: auto !important;
+            min-width: 200px;
+            padding: 16px 32px !important;
+            font-size: 1.1rem !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.5) !important;
+        }
+
+        /* --- OPENMCT / SPACEX LAUNCH CONSOLE OVERRIDES --- */
+
+        /* 1. Deep Space Black with Tactical Grid */
+        body {
+            background-color: #030406 !important;
+            background-image: 
+                linear-gradient(rgba(40, 60, 90, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(40, 60, 90, 0.15) 1px, transparent 1px) !important;
+            background-size: 40px 40px !important;
+        }
+
+        /* 2. Tactical MFD Panels (No Glass, No Blur) */
+        .hud, .panel, .sidebar, .modal, .tooltip, #hud, #tooltip {
+            background-color: #0a0e14 !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            border: 1px solid #1c2b3a !important;
+            border-radius: 4px !important;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 4px 15px rgba(0,0,0,0.6) !important;
+            border-top: 3px solid #005bb5 !important; /* Tactical accent line */
+        }
+
+        /* 3. Typography: Muted Headers, High-Contrast Monospace Data */
+        h1, h2, h3, h4, .nav-title, .panel-header, .label {
+            font-family: 'Inter', 'Roboto', sans-serif !important;
+            text-transform: uppercase !important;
+            letter-spacing: 2px !important;
+            color: #8da4be !important;
+        }
+
+        .telemetry-value, .hud-data, .stat-number, .budget-val, .deltav-val, span, p {
+            font-family: 'Fira Code', 'JetBrains Mono', 'Courier New', monospace !important;
+            color: #e2e8f0 !important;
+        }
+
+        /* 4. The Launch Button: Solid Tactical Action Switch */
+        button[class*="launch"], button[id*="launch"], .launch-btn {
+            background-color: #d90429 !important; /* Solid tactical red */
+            color: #ffffff !important; /* Pure white text for absolute contrast */
+            border: 1px solid #ef233c !important;
+            border-radius: 2px !important;
+            box-shadow: 0 4px 10px rgba(217, 4, 41, 0.4) !important;
+            text-transform: uppercase !important;
+            letter-spacing: 2px !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+        }
+
+        button[class*="launch"]:hover, button[id*="launch"]:hover, .launch-btn:hover {
+            background-color: #ef233c !important; /* Brighter ignition red on hover */
+            box-shadow: 0 0 20px rgba(239, 35, 60, 0.6) !important;
+            transform: translateY(-1px) !important;
+            filter: brightness(1.1) !important;
+        }
     </style>
 
     <!-- Three.js r128 -->
@@ -678,7 +766,7 @@
 <header>
     <div class="header-left">
         <div class="header-logo">
-            O2S: MISSION ARCHITECT
+            ORPHEUS: MISSION ARCHITECT
             <span>Aerospace Systems Design Simulator · NASA Space Apps 2026</span>
         </div>
         <span class="badge badge-gold">★ SPACE APPS 2026</span>
@@ -692,7 +780,13 @@
                 <span class="slider-track"></span>
             </label>
         </label>
-        <button class="audio-btn" id="audio-btn" title="Toggle mission audio effects">🔇 AUDIO</button>
+        <label class="sandbox-toggle" title="Toggle mission audio effects">
+            <span>AUDIO</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="audio-toggle" checked>
+                <span class="slider-track"></span>
+            </label>
+        </label>
     </div>
 </header>
 
@@ -734,9 +828,6 @@
                 <div id="instruments-container" class="inst-grid"></div>
             </div>
 
-            <!-- Launch Button -->
-            <button class="launch-btn" id="simulate-btn">🚀 LAUNCH &amp; SIMULATE MISSION</button>
-
         </div>
     </aside>
 
@@ -767,12 +858,7 @@
                     <div class="vab-label">Vehicle Assembly Building · WebGL Inspector</div>
                     <div class="vab-model-name" id="vab-model-name">Select a launch vehicle →</div>
                 </div>
-                <div class="camera-presets" id="camera-presets">
-                    <button class="cam-btn active" data-preset="full">📐 Full Stack</button>
-                    <button class="cam-btn" data-preset="upper">🔝 Upper Stage</button>
-                    <button class="cam-btn" data-preset="engine">🔥 Engine Bay</button>
-                    <button class="cam-btn" data-preset="auto">🔄 Auto-Rotate</button>
-                </div>
+
             </div>
         </div>
 
@@ -798,6 +884,11 @@
                     Run a simulation to see stage-by-stage breakdown and link budget analysis.
                 </div>
             </div>
+        </div>
+
+        <!-- HUD Launch Button Container - Centered -->
+        <div id="hud-launch-container">
+            <button class="launch-btn" id="simulate-btn">🚀 LAUNCH &amp; SIMULATE MISSION</button>
         </div>
 
     </div>
@@ -934,6 +1025,23 @@
 <script type="module" src="src/vab_3d.js"></script>
 <script type="module" src="src/trajectory_2d.js"></script>
 <script type="module" src="src/app.js"></script>
+
+<!-- FLIGHT DIRECTOR TUTORIAL OVERLAY -->
+<div id="tutorial-overlay" class="tut-hidden">
+    <div id="tutorial-mask"></div>
+    <div id="tutorial-dialog">
+        <div class="tut-header">MISSION CONTROL OP-COM</div>
+        <h3 id="tut-title">System Initialization</h3>
+        <p id="tut-text">Welcome, Flight Director. Let's walk through the orbital mechanics interface before your first launch.</p>
+        <div class="tut-footer">
+            <span id="tut-progress">1/4</span>
+            <button id="tut-next-btn" onclick="advanceTutorial()">Acknowledge ></button>
+        </div>
+    </div>
+</div>
+
+<!-- GLOBAL SMART TOOLTIP -->
+<div id="global-smart-tooltip"></div>
 
 </body>
 </html>
